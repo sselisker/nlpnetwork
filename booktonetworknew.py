@@ -5,12 +5,7 @@ import networkx
 tokenlist = list(csv.reader(open('data/tokens/wallace.infj.tokens', 'rb'),delimiter='\t', quoting=csv.QUOTE_NONE))
 # also to fix: weird quotes in the CSV file.
 
-
-
-# function Add a character
-
-
-
+#  TODO: function Add a string in the tokens as a character
 
 
 # *then* pick out our CSV columns: [0] = charid, [1] = charname, [2] = wordid:
@@ -21,42 +16,27 @@ node_dict = {}
 stopchars = ['he','she','him','her', 'Mr.', 'Mrs.', 'Ms.', 'his', 'hers', 'She', 'He', 'His', 'Her']
 for row in charcsv:
 	if row[0] in node_dict:
-		# how/if to count mentions? node_dict[row[0]]   
 		if node_dict[row[0]] < row[1] and row[1].lower() not in stopchars:
 			node_dict[row[0]] = row[1]
 	else:
 		node_dict[row[0]] = row[1]
 
-# print node_dict
+print node_dict
+
+# todo: implement function to further cluster characters by diff mention (Hal, Inc, Hallie, etc)
 
 edge_dict = {}
 
-# Just trying out the network generator function
 prevcharid = '0'
 prevwordid = '0'
 edgethreshold = 20 # ugh, realizing there's a scene break problem, technically. no scene break markers unless: double \n, all caps?
 
-# for row in charcsv:
-# 	#check if the char is in node list, add CharID/Char Name keys to node list (drop wordid)
-
-# 	# if (row[0] != prevcharid and int(row[2])-int(prevwordid) < edgethreshold):
-# 	if row[0] != prevcharid:
-# 		# add edge between row and prevcharid to edge_dict ... wait: weight; are we adding one to weight, or are we doing what?
-# 			if (row[0],prevcharid) in edge_dict:
-# 				edge_dict[(row[0],prevcharid)]=edge_dict[(row[0],prevcharid)]+1
-# 			elif (prevcharid,row[0]) in edge_dict:
-# 				edge_dict[(prevcharid,row[0])]=edge_dict[(prevcharid,row[0])]+1 
-# 			else:
-# 				edge_dict[(row[0],prevcharid)]=1
-# 	prevcharid = row[0]
-# 	prevwordid = row[2]
-
-# print edge_dict
+# From here below adapted from Neal Caren http://www.unc.edu/~ncaren/cite_network/citenet.py not currently in https://github.com/nealcaren?tab=repositories
 
 for row in charcsv:
 	#check if the char is in node list, add CharID/Char Name keys to node list (drop wordid)
 
-	# if (row[0] != prevcharid and int(row[2])-int(prevwordid) < edgethreshold):
+	# Character proximity: not yet working ... if (row[0] != prevcharid and int(row[2])-int(prevwordid) < edgethreshold):
 	if row[0] != prevcharid:
 		# add edge between row and prevcharid to edge_dict ... wait: weight; are we adding one to weight, or are we doing what?
 			name = node_dict[row[0]]
@@ -76,7 +56,7 @@ from networkx.readwrite import d3_js
 import re
 G=nx.Graph()
 for edge in edge_dict:
-    if edge_dict[edge]>3:# and cite_dict[edge[0]]>=8 and cite_dict[edge[1]]>=8 :
+    if edge_dict[edge]>4:# and cite_dict[edge[0]]>=8 and cite_dict[edge[1]]>=8 :
         G.add_edge(edge[0],edge[1],weight=edge_dict[edge])
 for node in G:    
     G.add_node(node) #adds list of nodes separately thru dict lookup
